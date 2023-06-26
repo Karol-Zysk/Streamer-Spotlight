@@ -1,18 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
 
-export interface ApiResponse<T> {
-  access_token: string;
-  refreshToken: string;
-  data?: T;
-  error?: string;
-}
-
-export interface AuthResponse {
-  access_token: string;
-  refreshToken: string;
-}
-
-export const baseUrl = "https://127.0.0.1:4000/api/v1";
+export const baseUrl = "http://127.0.0.1:4000/api/v1";
 
 export class ApiClient {
   private baseUrl: string;
@@ -25,11 +13,10 @@ export class ApiClient {
     try {
       const headers = config.headers || {};
 
-      const response = await axios.request<ApiResponse<T>>({
+      const response = await axios.request<T>({
         ...config,
         headers,
         baseURL: this.baseUrl,
-        withCredentials: true,
       });
 
       if (!response.data) {
@@ -38,13 +25,6 @@ export class ApiClient {
 
       return response.data;
     } catch (error: any) {
-      if (error.response && error.response.status === 403) {
-        throw error.response.data;
-      }
-      if (error.response && error.response.status === 401) {
-        throw error.response.data;
-      }
-
       throw error.response.data;
     }
   }
@@ -59,6 +39,15 @@ export class ApiClient {
   }
 
   async post<T>(url: string, data?: any): Promise<T> {
+    return this.request<T>({
+      method: "post",
+      url,
+      data,
+      baseURL: this.baseUrl,
+    });
+  }
+
+  async put<T>(url: string, data?: any): Promise<T> {
     return this.request<T>({
       method: "post",
       url,
