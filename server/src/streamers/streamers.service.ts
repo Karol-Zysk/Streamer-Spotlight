@@ -40,12 +40,18 @@ export class StreamersService {
     id: string,
     voteType: 'upVote' | 'downVote',
   ): Promise<Streamer> {
-    const streamer = await this.streamerModel.findById(id);
-    if (voteType === 'upVote') {
-      streamer.upvotes += 1;
-    } else if (voteType === 'downVote') {
-      streamer.downvotes += 1;
-    } else return;
+    const streamer = await this.streamerModel.findByIdAndUpdate(
+      id,
+      { $inc: { [voteType === 'upVote' ? 'upvotes' : 'downvotes']: 1 } },
+      { new: true },
+    );
+
+    if (!streamer) {
+      throw new Error('Streamer not found');
+    }
+
+    streamer.updatedAt = new Date();
+
     return streamer.save();
   }
 }

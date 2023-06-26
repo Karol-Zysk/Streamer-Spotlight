@@ -49,7 +49,7 @@ export class ApiClient {
 
   async put<T>(url: string, data?: any): Promise<T> {
     return this.request<T>({
-      method: "post",
+      method: "put",
       url,
       data,
       baseURL: this.baseUrl,
