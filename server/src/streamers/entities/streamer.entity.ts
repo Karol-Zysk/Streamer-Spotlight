@@ -2,10 +2,10 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { Platform } from 'utils/enums';
 
-export type UserDocument = Streamer & Document;
+export type StreamerDocument = Streamer & Document;
 
 @Schema()
-export class Streamer extends Document {
+export class Streamer {
   @Prop({
     required: true,
     maxLength: 16,
@@ -19,14 +19,31 @@ export class Streamer extends Document {
   description: string;
 
   @Prop({
-    select: false,
+    required: true,
+    enum: [
+      Platform.Kick,
+      Platform.Rumble,
+      Platform.TikTok,
+      Platform.Twitch,
+      Platform.YouTube,
+    ],
   })
   platform: Platform;
 
   @Prop({
-    default: 'default.jpg',
+    required: true,
   })
   image: string;
+
+  @Prop({
+    default: 0,
+  })
+  upvotes: number;
+
+  @Prop({
+    default: 0,
+  })
+  downvotes: number;
 
   @Prop({
     default: () => Date.now(),
