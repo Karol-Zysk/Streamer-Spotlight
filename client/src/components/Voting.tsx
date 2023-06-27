@@ -41,19 +41,20 @@ const Voting: React.FC<VotingProps> = ({ streamer }) => {
 
   return (
     <Box display="flex" alignItems="center" flexDirection="column">
-      <Flex w="80%" mb="4" justifyContent="space-around">
+      <Flex w="40%" mb="4" justifyContent="space-around">
         <Icon
           as={FaRegThumbsUp}
           fontSize="2rem"
-          color={votingType === "upVote" ? "#0008f7" : "#a0aec0"}
+          color={votingType === "upVote" ? "#0008f7" : "#656e7a"}
           cursor="pointer"
           mr="0.5rem"
+          _hover={{ transform: "scale(1.1)", cursor: "pointer" }}
           onClick={() => handleVote("upVote")}
         />
         <Icon
           as={FaRegThumbsDown}
           fontSize="2rem"
-          color={votingType === "downVote" ? "#e53e3e" : "#a0aec0"}
+          color={votingType === "downVote" ? "#e53e3e" : "#656e7a"}
           cursor="pointer"
           mr="0.5rem"
           onClick={() => handleVote("downVote")}

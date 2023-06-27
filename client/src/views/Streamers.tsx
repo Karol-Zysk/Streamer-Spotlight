@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import { ApiClient } from "../utils/ApiClient";
 import { Streamer } from "../utils/interfaces";
 import {
@@ -6,31 +7,17 @@ import {
   Spinner,
   Text,
   Button,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  FormControl,
-  FormLabel,
-  Input,
-  Select,
-  ModalCloseButton,
   useDisclosure,
+  Grid,
+  useToast,
 } from "@chakra-ui/react";
 import StreamerCard from "../components/StreamerCard";
-
-import { Platform } from "../utils/enums";
+import AddStreamerModal from "../components/AddStreamerModal";
 
 const Streamers = () => {
   const [streamers, setStreamers] = useState<Streamer[] | undefined>(undefined);
-  const [newStreamer, setNewStreamer] = useState<any>({
-    name: "",
-    description: "",
-    platform: "",
-    image: "",
-  });
+  const toast = useToast();
+
   const apiClient = useMemo(() => new ApiClient(), []);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -40,7 +27,13 @@ const Streamers = () => {
         const res = await apiClient.get<Streamer[]>(`/streamers`);
         setStreamers(res);
       } catch (error: any) {
-        console.log(error.message);
+        toast({
+          title: "Error",
+          description: error.message.join(", "),
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
       }
     };
 
@@ -48,114 +41,60 @@ const Streamers = () => {
   }, [apiClient]);
 
   const handleAddStreamer = () => {
-    onOpen(); // Otwarcie modala
-  };
-
-  const handleSubmit = async () => {
-    try {
-      await apiClient.post("/streamers", newStreamer);
-      onClose(); // Zamknięcie modala po pomyślnym dodaniu streamera
-      setNewStreamer({
-        name: "",
-        description: "",
-        platform: "",
-        image: "",
-      });
-      // Aktualizacja listy streamerów
-      const updatedStreamers = await apiClient.get<Streamer[]>("/streamers");
-      setStreamers(updatedStreamers);
-    } catch (error: any) {
-      console.log(error.message);
-    }
-  };
-
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setNewStreamer((prevStreamer) => ({
-      ...prevStreamer,
-      [name]: value,
-    }));
+    onOpen();
   };
 
   if (!streamers)
     return (
       <Flex minH={"full"} alignItems={"center"} justifyContent={"center"}>
-        <Spinner />
+        <Spinner size={"lg"} speed="0.8s" />
       </Flex>
     );
 
   return (
-    <Flex direction="column">
-      <Button mt="2" onClick={handleAddStreamer}>
-        Dodaj streamera
+    <Flex direction="column" justify={"center"} align={"center"}>
+      <Button
+        size={"lg"}
+        w="min-content"
+        border={"2px"}
+        boxShadow={"0px 0px 2px 2px purple"}
+        mt={"2"}
+        mb={"8"}
+        onClick={handleAddStreamer}
+      >
+        Add Streamer
       </Button>
 
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Dodaj streamera</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <FormControl>
-              <FormLabel>Nazwa</FormLabel>
-              <Input
-                name="name"
-                value={newStreamer.name}
-                onChange={handleInputChange}
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Opis</FormLabel>
-              <Input
-                name="description"
-                value={newStreamer.description}
-                onChange={handleInputChange}
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Platforma</FormLabel>
-              <Select
-                name="platform"
-                value={newStreamer.platform}
-                onChange={handleInputChange}
-              >
-                <option value="">Wybierz platformę</option>
-                {/* Dodaj opcje dla wszystkich wartości z enumu Platform */}
-                {Object.values(Platform).map((value) => (
-                  <option key={value} value={value}>
-                    {value}
-                  </option>
-                ))}
-              </Select>
-            </FormControl>
-            <FormControl>
-              <FormLabel>Obrazek</FormLabel>
-              <Input
-                name="image"
-                value={newStreamer.image}
-                onChange={handleInputChange}
-              />
-            </FormControl>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={handleSubmit}>
-              Dodaj
-            </Button>
-            <Button variant="ghost" onClick={onClose}>
-              Anuluj
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      <AddStreamerModal
+        isOpen={isOpen}
+        onClose={onClose}
+        setStreamers={setStreamers}
+      />
 
       {streamers.length === 0 ? (
         <Text>No Active Streamers Yet</Text>
       ) : (
-        streamers.map((streamer: Streamer) => (
-          <StreamerCard streamer={streamer} key={streamer._id} />
-        ))
+        <Grid
+          templateColumns={[
+            "repeat(1, 1fr)",
+            "repeat(1, 1fr)",
+            "repeat(2, 1fr)",
+            "repeat(2, 1fr)",
+            "repeat(3, 1fr)",
+          ]}
+          gap={6}
+        >
+          {streamers.map((streamer: Streamer, index: number) => (
+            <motion.div
+              key={streamer._id}
+              initial={{ opacity: 0, y: -15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.2 }}
+            >
+              <StreamerCard streamer={streamer} />
+            </motion.div>
+          ))}
+        </Grid>
       )}
     </Flex>
   );
