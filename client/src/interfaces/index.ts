@@ -1,4 +1,4 @@
-import { Platform } from "./enums";
+import { Platform } from "../enums";
 
 export interface Streamer {
   createdAt: string;

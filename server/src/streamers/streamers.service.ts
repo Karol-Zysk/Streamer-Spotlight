@@ -21,10 +21,15 @@ export class StreamersService {
   }
 
   async findAllStreamers(): Promise<Streamer[]> {
-    return this.streamerModel.find().exec();
+    const streamers = await this.streamerModel.find().exec();
+    return streamers.reverse();
   }
 
   async findStreamerById(id: string): Promise<Streamer> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('Invalid streamer ID');
+    }
+
     try {
       const streamer = await this.streamerModel.findOne({ _id: id }).exec();
       if (!streamer) {

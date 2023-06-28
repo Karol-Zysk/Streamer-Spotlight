@@ -3,13 +3,13 @@ import {
   Box,
   Button,
   Flex,
-  Heading,
+  Text,
   useColorMode,
   useColorModeValue,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 
-export default function Navbar() {
+export const Navbar = () => {
   const navigate = useNavigate();
   const { colorMode, toggleColorMode } = useColorMode();
   const color = useColorModeValue(
@@ -18,24 +18,25 @@ export default function Navbar() {
   );
 
   return (
-    <Box bg={color} px={4} py={2}>
+    <Box bg={color} borderBottom={"4px"} px={4} py={2}>
       <Flex h="min" p="4" align={"center"} justifyContent={"space-between"}>
-        <Heading
-          filter={"blur(0.07rem)"}
+        <Text
+          filter={"blur(0.06rem)"}
           _hover={{
             cursor: "pointer",
             filter: "blur(0.01rem)",
             transition: "500ms ease-in-out",
           }}
-          onClick={() => navigate(`/`)}
-          textShadow={"2px 2px 3px  purple"}
+          fontSize={["xl", "3xl"]}
+          onClick={() => navigate(`/streamers`)}
+          textShadow={"3px 3px 4px  purple"}
         >
           Streamer Spotlight
-        </Heading>
+        </Text>
         <Button size={"sm"} onClick={toggleColorMode}>
           {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
         </Button>
       </Flex>
     </Box>
   );
-}
+};

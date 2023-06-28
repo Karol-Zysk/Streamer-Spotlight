@@ -1,51 +1,33 @@
 import { useParams } from "react-router-dom";
-import { Streamer } from "../utils/interfaces";
+import { Streamer } from "../interfaces";
 import { useEffect, useMemo, useState } from "react";
-import { ApiClient } from "../utils/ApiClient";
-import {
-  Avatar,
-  Box,
-  Flex,
-  Spinner,
-  Text,
-  useColorModeValue,
-  useToast,
-} from "@chakra-ui/react";
+import { ApiClient } from "../services/ApiClient";
+import { Avatar, Box, Flex, Text, useColorModeValue } from "@chakra-ui/react";
+import { ErrorMessage, Spinner } from "../components";
 
-const StreamerPage = () => {
+export const StreamerPage = () => {
   const [streamer, setStreamer] = useState<Streamer | undefined>(undefined);
-  const toast = useToast();
+  const [error, setError] = useState<string | undefined>(undefined);
   const { id } = useParams();
   const bg = useColorModeValue("blackAlpha.400", "whiteAlpha.300");
 
   const apiClient = useMemo(() => new ApiClient(), []);
-
   const getStreamer = async () => {
     try {
       const res: Streamer = await apiClient.get(`/streamers/${id}`);
       setStreamer(res);
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: "Invalid User Id",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+      setError(error.message);
     }
   };
-  console.log(streamer);
 
   useEffect(() => {
     getStreamer();
   }, []);
 
-  if (!streamer)
-    return (
-      <Flex minH={"full"} alignItems={"center"} justifyContent={"center"}>
-        <Spinner size={"lg"} speed="0.8s" />
-      </Flex>
-    );
+  if (error) return <ErrorMessage error={error} />;
+
+  if (!streamer) return <Spinner />;
 
   return (
     <Flex
@@ -53,24 +35,23 @@ const StreamerPage = () => {
       marginBottom={"auto"}
       alignSelf={"center"}
       direction={"column"}
-      minW="xl"
-      w={"xl"}
+      w={["xs", "lg", "xl"]}
       border={"2px"}
       borderRadius="lg"
-      boxShadow="4px 4px 4px 4px"
+      boxShadow="3px 3px 2px 2px"
       bg={bg}
-      minH={"40vh"}
+      minH={"35vh"}
       p={"4"}
     >
       <Flex p="2" justify={"space-between"}>
-        <Text fontWeight="bold" fontSize="3xl" mt="4">
+        <Text fontWeight="bold" fontSize={["xl", "3xl"]} mt="4">
           {streamer.name}
         </Text>
 
-        <Avatar size={"xl"} src={streamer.image} name={streamer.name} />
+        <Avatar size={["lg", "xl"]} src={streamer.image} name={streamer.name} />
       </Flex>
 
-      <Box mt="4" fontSize="lg">
+      <Box mt="4" fontSize={["md", "lg"]}>
         <Text mb="2">
           <strong>Description:</strong> {streamer.description}
         </Text>
@@ -81,4 +62,3 @@ const StreamerPage = () => {
     </Flex>
   );
 };
-export default StreamerPage;

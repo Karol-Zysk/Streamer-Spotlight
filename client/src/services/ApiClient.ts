@@ -25,6 +25,9 @@ export class ApiClient {
 
       return response.data;
     } catch (error: any) {
+      if (!error.response) {
+        throw error;
+      }
       throw error.response.data;
     }
   }

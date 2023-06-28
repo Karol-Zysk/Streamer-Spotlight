@@ -15,9 +15,9 @@ import {
   useColorModeValue,
   useToast,
 } from "@chakra-ui/react";
-import { Streamer } from "../utils/interfaces";
-import { ApiClient } from "../utils/ApiClient";
-import { Platform } from "../utils/enums";
+import { Streamer } from "../interfaces";
+import { ApiClient } from "../services/ApiClient";
+import { Platform } from "../enums";
 
 interface AddStreamerProps {
   onClose: () => void;
@@ -25,11 +25,12 @@ interface AddStreamerProps {
   setStreamers: React.Dispatch<React.SetStateAction<Streamer[] | undefined>>;
 }
 
-const AddStreamerModal: React.FC<AddStreamerProps> = ({
+export const AddStreamerModal: React.FC<AddStreamerProps> = ({
   onClose,
   isOpen,
   setStreamers,
 }) => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [newStreamer, setNewStreamer] = useState<
     Pick<Streamer, "name" | "description" | "platform" | "image">
   >({
@@ -42,6 +43,7 @@ const AddStreamerModal: React.FC<AddStreamerProps> = ({
   const toast = useToast();
 
   const handleSubmit = async () => {
+    setIsLoading(true);
     try {
       const apiClient = new ApiClient();
       await apiClient.post("/streamers", newStreamer);
@@ -63,8 +65,6 @@ const AddStreamerModal: React.FC<AddStreamerProps> = ({
         isClosable: true,
       });
     } catch (error: any) {
-      console.log(error);
-
       toast({
         title: "Error",
         description: error.message.join(", "),
@@ -72,6 +72,8 @@ const AddStreamerModal: React.FC<AddStreamerProps> = ({
         duration: 3000,
         isClosable: true,
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -89,8 +91,8 @@ const AddStreamerModal: React.FC<AddStreamerProps> = ({
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent
-        boxShadow="4px 4px 4px 4px"
-        p="8"
+        boxShadow="2px 2px 2px 2px"
+        p={["4", "8"]}
         bg={useColorModeValue("gray.100", "gray.900")}
       >
         <ModalHeader>Add New Streamer</ModalHeader>
@@ -141,7 +143,12 @@ const AddStreamerModal: React.FC<AddStreamerProps> = ({
           </FormControl>
         </ModalBody>
         <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={handleSubmit}>
+          <Button
+            colorScheme="blue"
+            mr={3}
+            isLoading={isLoading}
+            onClick={handleSubmit}
+          >
             Add
           </Button>
           <Button border={"1px"} variant="ghost" onClick={onClose}>
@@ -152,4 +159,3 @@ const AddStreamerModal: React.FC<AddStreamerProps> = ({
     </Modal>
   );
 };
-export default AddStreamerModal;

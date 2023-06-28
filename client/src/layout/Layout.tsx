@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
-import Navbar from "../components/Navbar";
 import { Flex, useColorModeValue } from "@chakra-ui/react";
+import { Navbar } from "../components";
 
 interface LayoutProps {
   children: ReactNode;

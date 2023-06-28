@@ -1,21 +1,26 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { ApiClient } from "../utils/ApiClient";
-import { Streamer } from "../utils/interfaces";
+import { ApiClient } from "../services/ApiClient";
+import { Streamer } from "../interfaces";
 import {
   Flex,
-  Spinner,
   Text,
   Button,
   useDisclosure,
   Grid,
   useToast,
+  Box,
 } from "@chakra-ui/react";
-import StreamerCard from "../components/StreamerCard";
-import AddStreamerModal from "../components/AddStreamerModal";
+import {
+  AddStreamerModal,
+  ErrorMessage,
+  Spinner,
+  StreamerCard,
+} from "../components";
 
-const Streamers = () => {
+export const Streamers = () => {
   const [streamers, setStreamers] = useState<Streamer[] | undefined>(undefined);
+  const [error, setError] = useState<string | undefined>(undefined);
   const toast = useToast();
 
   const apiClient = useMemo(() => new ApiClient(), []);
@@ -27,6 +32,7 @@ const Streamers = () => {
         const res = await apiClient.get<Streamer[]>(`/streamers`);
         setStreamers(res);
       } catch (error: any) {
+        setError(error.message);
         toast({
           title: "Error",
           description: error.message.join(", "),
@@ -44,12 +50,9 @@ const Streamers = () => {
     onOpen();
   };
 
-  if (!streamers)
-    return (
-      <Flex minH={"full"} alignItems={"center"} justifyContent={"center"}>
-        <Spinner size={"lg"} speed="0.8s" />
-      </Flex>
-    );
+  if (error) return <ErrorMessage error={error} />;
+
+  if (!streamers) return <Spinner />;
 
   return (
     <Flex direction="column" justify={"center"} align={"center"}>
@@ -85,19 +88,18 @@ const Streamers = () => {
           gap={6}
         >
           {streamers.map((streamer: Streamer, index: number) => (
-            <motion.div
+            <Box
+              as={motion.div}
               key={streamer._id}
               initial={{ opacity: 0, y: -15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.2 }}
+              transition={{ delay: `${index * 0.2}` }}
             >
               <StreamerCard streamer={streamer} />
-            </motion.div>
+            </Box>
           ))}
         </Grid>
       )}
     </Flex>
   );
 };
-
-export default Streamers;

@@ -1,20 +1,20 @@
-import { Badge, Box, Flex, Icon } from "@chakra-ui/react";
+import { Badge, Box, Flex, Icon, useToast } from "@chakra-ui/react";
 import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
-import { Streamer } from "../utils/interfaces";
+import { Streamer } from "../interfaces";
 import { useState } from "react";
-import { ApiClient } from "../utils/ApiClient";
+import { ApiClient } from "../services/ApiClient";
 
 interface VotingProps {
   streamer: Streamer;
 }
 
-const Voting: React.FC<VotingProps> = ({ streamer }) => {
+export const Voting: React.FC<VotingProps> = ({ streamer }) => {
   const [voted, setVoted] = useState(false);
   const [updatedStreamer, setUpdatedStreamer] = useState(streamer);
   const [votingType, setVotingType] = useState<"upVote" | "downVote" | null>(
     null
   );
-
+  const toast = useToast();
   const apiClient = new ApiClient();
 
   const onVote = async (id: string, voteType: "upVote" | "downVote") => {
@@ -29,7 +29,13 @@ const Voting: React.FC<VotingProps> = ({ streamer }) => {
       setUpdatedStreamer(updatedStreamer);
       setVoted(true);
     } catch (error: any) {
-      console.log(error.message);
+      toast({
+        title: "Error",
+        description: error.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
 
@@ -46,7 +52,6 @@ const Voting: React.FC<VotingProps> = ({ streamer }) => {
           as={FaRegThumbsUp}
           fontSize="2rem"
           color={votingType === "upVote" ? "#0008f7" : "#656e7a"}
-          cursor="pointer"
           mr="0.5rem"
           _hover={{ transform: "scale(1.1)", cursor: "pointer" }}
           onClick={() => handleVote("upVote")}
@@ -55,7 +60,7 @@ const Voting: React.FC<VotingProps> = ({ streamer }) => {
           as={FaRegThumbsDown}
           fontSize="2rem"
           color={votingType === "downVote" ? "#e53e3e" : "#656e7a"}
-          cursor="pointer"
+          _hover={{ transform: "scale(1.1)", cursor: "pointer" }}
           mr="0.5rem"
           onClick={() => handleVote("downVote")}
         />
@@ -67,5 +72,3 @@ const Voting: React.FC<VotingProps> = ({ streamer }) => {
     </Box>
   );
 };
-
-export default Voting;
