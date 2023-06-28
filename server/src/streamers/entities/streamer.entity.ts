@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { Platform } from 'utils/enums';
+import { Platform } from '../../utils/enums';
 
 export type StreamerDocument = Streamer & Document;
 

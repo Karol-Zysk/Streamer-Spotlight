@@ -1,5 +1,5 @@
 import { IsString, IsNotEmpty, IsEnum } from 'class-validator';
-import { Platform } from 'utils/enums';
+import { Platform } from '../../utils/enums';
 
 export class CreateStreamerDto {
   @IsString()
